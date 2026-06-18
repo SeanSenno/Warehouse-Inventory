@@ -12,7 +12,6 @@
     --rb-clean-blue: #8CB6C9;
     --rb-dark-grey:  #6D6E70;
     --rb-light-grey: #EEEEEE;
-    --rb-maroon:     #5E3B3F;
     --rb-green:      #2E7D32;
     --rb-font-heading: Georgia, 'Times New Roman', serif;
     --rb-font-body:    Arial, Helvetica, sans-serif;
@@ -20,7 +19,6 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: var(--rb-font-body); background: var(--rb-light-grey); color: var(--rb-dark-grey); min-height: 100vh; display: flex; flex-direction: column; }
   header { background: var(--rb-slate); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-  header img { height: 36px; }
   header h1 { font-family: var(--rb-font-heading); font-size: 20px; color: var(--rb-white); letter-spacing: 0.5px; }
   .header-right { font-size: 12px; color: var(--rb-clean-blue); text-align: right; white-space: nowrap; }
   main { flex: 1; display: grid; grid-template-columns: 1fr 380px; gap: 20px; padding: 20px; max-width: 1200px; margin: 0 auto; width: 100%; }
@@ -35,7 +33,24 @@
   input:focus, select:focus, textarea:focus { outline: none; border-color: var(--rb-clean-blue); }
   input::placeholder, textarea::placeholder { color: #bbb; }
   textarea { resize: none; height: 72px; }
-  .sku-row { display: grid; grid-template-columns: 1fr 100px auto; gap: 10px; align-items: end; }
+  .sku-search-wrap { position: relative; margin-bottom: 10px; }
+  .sku-search-input { width: 100%; padding: 11px 14px 11px 38px; border: 2px solid #ddd; border-radius: 4px; font-family: var(--rb-font-body); font-size: 15px; color: var(--rb-dark-grey); background: var(--rb-white); transition: border-color 0.15s; }
+  .sku-search-input:focus { outline: none; border-color: var(--rb-clean-blue); }
+  .sku-search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #bbb; pointer-events: none; }
+  .sku-results { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: white; border: 2px solid var(--rb-clean-blue); border-radius: 4px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); max-height: 220px; overflow-y: auto; z-index: 50; display: none; }
+  .sku-results.show { display: block; }
+  .sku-result-item { padding: 11px 14px; cursor: pointer; border-bottom: 1px solid var(--rb-light-grey); transition: background 0.1s; }
+  .sku-result-item:last-child { border-bottom: none; }
+  .sku-result-item:hover { background: var(--rb-light-grey); }
+  .sku-result-sku { font-size: 11px; font-weight: bold; color: var(--rb-red); text-transform: uppercase; }
+  .sku-result-name { font-size: 14px; font-weight: bold; color: var(--rb-slate); margin-top: 2px; }
+  .sku-result-meta { font-size: 12px; color: #999; margin-top: 2px; }
+  .sku-selected-display { background: #e8f0f5; border: 2px solid var(--rb-clean-blue); border-radius: 4px; padding: 10px 14px; display: none; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .sku-selected-display.show { display: flex; }
+  .sku-selected-info { font-size: 14px; color: var(--rb-slate); }
+  .sku-clear-btn { background: none; border: none; color: #999; cursor: pointer; font-size: 20px; padding: 2px 6px; transition: color 0.15s; line-height: 1; }
+  .sku-clear-btn:hover { color: var(--rb-red); }
+  .sku-row { display: grid; grid-template-columns: 100px auto; gap: 10px; align-items: end; }
   .btn { padding: 11px 20px; border: none; border-radius: 4px; font-family: var(--rb-font-body); font-size: 14px; font-weight: bold; cursor: pointer; transition: opacity 0.15s, transform 0.1s; white-space: nowrap; }
   .btn:active { transform: scale(0.97); }
   .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
@@ -61,6 +76,7 @@
   .cart-total-label { font-size: 13px; font-weight: bold; color: var(--rb-slate); text-transform: uppercase; letter-spacing: 0.5px; }
   .cart-total-amount { font-family: var(--rb-font-heading); font-size: 22px; font-weight: bold; color: var(--rb-slate); }
   .cart-count-badge { background: var(--rb-red); color: white; border-radius: 10px; padding: 2px 8px; font-size: 11px; margin-left: auto; }
+  .cart-header-row { display: flex; align-items: center; justify-content: space-between; width: 100%; }
   .status-bar { text-align: center; padding: 10px 20px; font-size: 13px; font-weight: bold; border-top: 3px solid transparent; min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s; }
   .status-bar.idle { color: #aaa; }
   .status-bar.loading { background: #fffbea; border-color: #f0c040; color: #7a6000; }
@@ -76,10 +92,9 @@
   .overlay-card .btn-primary { padding: 14px 40px; font-size: 15px; }
   .spinner { width: 18px; height: 18px; border: 3px solid rgba(0,0,0,0.15); border-top-color: currentColor; border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .cart-header-row { display: flex; align-items: center; justify-content: space-between; width: 100%; }
   @media (max-width: 820px) {
     main { grid-template-columns: 1fr; padding: 12px; gap: 12px; }
-    .sku-row { grid-template-columns: 1fr 80px auto; gap: 8px; }
+    .sku-row { grid-template-columns: 80px auto; gap: 8px; }
     header h1 { font-size: 16px; }
   }
 </style>
@@ -87,7 +102,6 @@
 <body>
 
 <header>
-  <img src="https://seansenno.github.io/Warehouse-Inventory/rebath-logo.png" onerror="this.style.display='none'" alt="Re-Bath" style="height:36px;">
   <h1>Material Pull Station</h1>
   <div class="header-right">Warehouse Operations<br>Re-Bath of New England</div>
 </header>
@@ -111,15 +125,24 @@
       <div class="card-header"><span class="step-badge">2</span> Add Items to Cart</div>
       <div class="card-body">
         <div class="field-group">
-          <label>Select SKU</label>
-          <div class="sku-row">
-            <select id="skuSelect"><option value="">— Loading inventory… —</option></select>
-            <div class="field-group" style="margin:0;">
-              <input type="number" id="qtyInput" placeholder="Qty" min="1" value="1">
-            </div>
-            <button class="btn btn-add" id="addToCartBtn" onclick="addToCart()" disabled>Add</button>
+          <label>Search SKU or Item Name</label>
+          <div class="sku-search-wrap">
+            <svg class="sku-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" class="sku-search-input" id="skuSearch" placeholder="Type SKU or item name…" autocomplete="off" autocorrect="off" autocapitalize="off">
+            <div class="sku-results" id="skuResults"></div>
           </div>
-          <div id="skuInfo" style="margin-top:8px;font-size:13px;color:var(--rb-clean-blue);min-height:18px;"></div>
+          <div class="sku-selected-display" id="skuSelectedDisplay">
+            <div class="sku-selected-info">
+              <span id="skuSelectedSku" style="font-size:11px;font-weight:bold;color:var(--rb-red);text-transform:uppercase;display:block;"></span>
+              <strong id="skuSelectedName" style="display:block;font-size:15px;"></strong>
+              <span id="skuSelectedMeta" style="font-size:12px;color:#999;"></span>
+            </div>
+            <button class="sku-clear-btn" onclick="clearSkuSelection()" title="Clear">×</button>
+          </div>
+          <div class="sku-row">
+            <input type="number" id="qtyInput" placeholder="Qty" min="1" value="1">
+            <button class="btn btn-add" id="addToCartBtn" onclick="addToCart()" disabled>Add to Cart</button>
+          </div>
         </div>
       </div>
     </div>
@@ -136,13 +159,13 @@
       <div class="card-header">
         <div class="cart-header-row">
           <span style="display:flex;align-items:center;gap:8px;"><span class="step-badge">4</span> Cart</span>
-          <span id="cartBadge" class="cart-count-badge" style="display:none;">0 items</span>
+          <span id="cartBadge" class="cart-count-badge" style="display:none;"></span>
         </div>
       </div>
       <div class="card-body" style="flex:1;overflow-y:auto;max-height:420px;">
         <div id="cartEmpty" class="cart-empty">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-          No items yet.<br>Select a SKU and add it above.
+          No items yet.<br>Search a SKU and add it above.
         </div>
         <div id="cartItems"></div>
       </div>
@@ -177,10 +200,12 @@
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxmKcUMX_kQ51jDcsnnBEggjnwc15l-PW1kbb7O5ndvs1hZn2Z9g3emQnhJlMQ0k-wSgQ/exec';
 let inventory = [];
 let cart = [];
+let selectedSku = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   loadInventory();
-  document.getElementById('skuSelect').addEventListener('change', onSkuChange);
+  document.getElementById('skuSearch').addEventListener('input', onSkuSearch);
+  document.addEventListener('click', e => { if (!e.target.closest('.sku-search-wrap')) closeSkuResults(); });
   document.getElementById('installerName').addEventListener('input', updateCompleteBtn);
   document.getElementById('customerName').addEventListener('input', updateCompleteBtn);
 });
@@ -192,37 +217,73 @@ async function loadInventory() {
     const data = await res.json();
     if (data.error) throw new Error(data.error);
     inventory = (data.items || []).filter(i => i.qty > 0);
-    populateSkuDropdown();
+    if (!inventory.length) document.getElementById('skuSearch').placeholder = '— No items in stock —';
     setStatus('idle', 'Ready');
   } catch (err) {
     setStatus('error', 'Could not load inventory. Check connection.');
-    document.getElementById('skuSelect').innerHTML = '<option value="">— Failed to load —</option>';
+    document.getElementById('skuSearch').placeholder = '— Failed to load. Check connection —';
   }
 }
 
-function populateSkuDropdown() {
-  const sel = document.getElementById('skuSelect');
-  if (!inventory.length) { sel.innerHTML = '<option value="">— No items in stock —</option>'; return; }
-  sel.innerHTML = '<option value="">— Select a SKU —</option>' +
-    inventory.map(i => `<option value="${i.sku}">${i.sku} — ${i.name}${i.finishColor ? ' / ' + i.finishColor : ''}</option>`).join('');
+function onSkuSearch() {
+  const q = document.getElementById('skuSearch').value.trim().toLowerCase();
+  const results = document.getElementById('skuResults');
+  if (!q) { closeSkuResults(); return; }
+  const matches = inventory.filter(i =>
+    i.sku.toLowerCase().includes(q) ||
+    i.name.toLowerCase().includes(q) ||
+    (i.finishColor && i.finishColor.toLowerCase().includes(q))
+  ).slice(0, 12);
+  if (!matches.length) {
+    results.innerHTML = '<div style="padding:12px 14px;color:#999;font-size:13px;">No items found.</div>';
+    results.classList.add('show');
+    return;
+  }
+  results.innerHTML = matches.map(i => {
+    const price = i.unitPrice ? '$' + parseFloat(i.unitPrice).toFixed(2) + ' / unit' : 'No price on file';
+    return '<div class="sku-result-item" onclick="selectSku(\'' + i.sku.replace(/'/g, "\\'") + '\')">' +
+      '<div class="sku-result-sku">' + i.sku + '</div>' +
+      '<div class="sku-result-name">' + i.name + (i.finishColor ? ' <span style="font-weight:normal;color:#999;">/ ' + i.finishColor + '</span>' : '') + '</div>' +
+      '<div class="sku-result-meta">' + (i.category || '') + ' · ' + price + ' · ' + i.qty + ' in stock</div>' +
+      '</div>';
+  }).join('');
+  results.classList.add('show');
+}
+
+function selectSku(sku) {
+  const item = inventory.find(i => i.sku === sku);
+  if (!item) return;
+  selectedSku = sku;
+  document.getElementById('skuSearch').value = '';
+  closeSkuResults();
+  const price = item.unitPrice ? '$' + parseFloat(item.unitPrice).toFixed(2) + ' / unit' : 'No price on file';
+  document.getElementById('skuSelectedSku').textContent = item.sku;
+  document.getElementById('skuSelectedName').textContent = item.name + (item.finishColor ? ' / ' + item.finishColor : '');
+  document.getElementById('skuSelectedMeta').textContent = (item.category || '') + ' · ' + price + ' · ' + item.qty + ' in stock';
+  document.getElementById('skuSelectedDisplay').classList.add('show');
+  document.getElementById('qtyInput').max = item.qty;
+  document.getElementById('qtyInput').focus();
   document.getElementById('addToCartBtn').disabled = false;
 }
 
-function onSkuChange() {
-  const sku = document.getElementById('skuSelect').value;
-  const info = document.getElementById('skuInfo');
-  if (!sku) { info.textContent = ''; return; }
-  const item = inventory.find(i => i.sku === sku);
-  if (!item) { info.textContent = ''; return; }
-  const price = item.unitPrice ? `$${parseFloat(item.unitPrice).toFixed(2)} / unit` : 'No price on file';
-  info.textContent = `${item.category || ''} · ${price} · ${item.qty} in stock`;
-  document.getElementById('qtyInput').max = item.qty;
+function clearSkuSelection() {
+  selectedSku = null;
+  document.getElementById('skuSelectedDisplay').classList.remove('show');
+  document.getElementById('addToCartBtn').disabled = true;
+  document.getElementById('skuSearch').value = '';
+  document.getElementById('skuSearch').focus();
+}
+
+function closeSkuResults() {
+  const r = document.getElementById('skuResults');
+  r.classList.remove('show');
+  r.innerHTML = '';
 }
 
 function addToCart() {
-  const sku = document.getElementById('skuSelect').value;
+  const sku = selectedSku;
   const qty = parseInt(document.getElementById('qtyInput').value, 10);
-  if (!sku) { setStatus('error', 'Select a SKU first.'); return; }
+  if (!sku) { setStatus('error', 'Search and select a SKU first.'); return; }
   if (!qty || qty < 1) { setStatus('error', 'Enter a valid quantity.'); return; }
   const item = inventory.find(i => i.sku === sku);
   if (!item) return;
@@ -238,9 +299,8 @@ function addToCart() {
     cart.push({ id: item.id, sku: item.sku, name: item.name, unitPrice, qty, lineTotal: qty * unitPrice });
   }
   renderCart();
-  document.getElementById('skuSelect').value = '';
+  clearSkuSelection();
   document.getElementById('qtyInput').value = '1';
-  document.getElementById('skuInfo').textContent = '';
   setStatus('idle', `${item.name} added to cart.`);
 }
 
@@ -276,8 +336,8 @@ function renderCart() {
   const total = cart.reduce((s, c) => s + c.lineTotal, 0);
   totalEl.textContent = `$${total.toFixed(2)}`;
   badge.style.display = '';
-  const totalItems = cart.reduce((s, c) => s + c.qty, 0);
-  badge.textContent = `${cart.length} SKU${cart.length !== 1 ? 's' : ''} · ${totalItems} unit${totalItems !== 1 ? 's' : ''}`;
+  const totalUnits = cart.reduce((s, c) => s + c.qty, 0);
+  badge.textContent = `${cart.length} SKU${cart.length !== 1 ? 's' : ''} · ${totalUnits} unit${totalUnits !== 1 ? 's' : ''}`;
   items.innerHTML = cart.map(c => `
     <div class="cart-item">
       <div class="cart-item-info">
@@ -328,9 +388,8 @@ function resetForm() {
   document.getElementById('installerName').value = '';
   document.getElementById('customerName').value = '';
   document.getElementById('pullNotes').value = '';
-  document.getElementById('skuSelect').value = '';
   document.getElementById('qtyInput').value = '1';
-  document.getElementById('skuInfo').textContent = '';
+  clearSkuSelection();
   renderCart();
   document.getElementById('successOverlay').classList.remove('show');
   setStatus('idle', 'Ready for next pull.');
