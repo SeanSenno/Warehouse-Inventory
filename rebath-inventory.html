@@ -105,13 +105,14 @@
   </div>
   <div class="table-wrap">
     <table>
-      <thead><tr><th>SKU</th><th>Item Name</th><th>Category</th><th>Finish / Color</th><th>Details</th><th>Qty</th><th>Low At</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead>
+      <thead><tr>
+        <th>SKU</th><th>Item Name</th><th>Details</th><th>Finish / Color</th><th>Category</th><th>Qty</th><th>Low At</th><th>Location</th><th>Status</th><th>Actions</th>
+      </tr></thead>
       <tbody id="tbl-body"><tr><td colspan="10" class="empty-msg"><span class="spinner"></span>&nbsp;Loading...</td></tr></tbody>
     </table>
   </div>
 </div>
 <div id="panel-log" style="display:none"><div class="log-wrap" id="log-body"></div></div>
-
 <div id="item-modal" style="display:none">
   <div class="overlay" onclick="if(event.target===this)closeIM()">
     <div class="modal">
@@ -148,7 +149,6 @@
     </div>
   </div>
 </div>
-
 <div id="co-modal" style="display:none">
   <div class="overlay" onclick="if(event.target===this)closeCO()">
     <div class="modal">
@@ -171,53 +171,32 @@
     </div>
   </div>
 </div>
-
 <script>
 const PROXY='https://script.google.com/macros/s/AKfycbxmKcUMX_kQ51jDcsnnBEggjnwc15l-PW1kbb7O5ndvs1hZn2Z9g3emQnhJlMQ0k-wSgQ/exec';
 const HEADERS=['ID','Name','SKU','Category','Finish/Color','Details','Qty','Threshold','Location','Notes','Material Cost'];
 let items=[],log=[],editId=null,coId=null,nextId=1;
-
 function setSync(msg,type){const el=document.getElementById('sync-bar');el.className='sync-bar '+(type||'syncing');el.innerHTML=(type==='syncing'||!type)?'<span class="spinner"></span>&nbsp;'+msg:msg;}
 async function apiFetch(url,opts){const r=await fetch(url,opts);const text=await r.text();try{return JSON.parse(text);}catch(e){throw new Error('Bad response: '+text.slice(0,100));}}
-
-async function loadData(){
-  setSync('Syncing from Google Sheets...','syncing');document.getElementById('sync-btn').disabled=true;
-  try{const[invRes,logRes]=await Promise.all([apiFetch(PROXY+'?action=getInventory'),apiFetch(PROXY+'?action=getLog')]);parseInventory(invRes);parseLog(logRes);setSync('Synced '+items.length+' items &mdash; '+new Date().toLocaleTimeString(),'ok');}
-  catch(e){setSync('Sync error: '+e.message,'err');}
-  document.getElementById('sync-btn').disabled=false;renderAll();
-}
-
+async function loadData(){setSync('Syncing from Google Sheets...','syncing');document.getElementById('sync-btn').disabled=true;try{const[invRes,logRes]=await Promise.all([apiFetch(PROXY+'?action=getInventory'),apiFetch(PROXY+'?action=getLog')]);parseInventory(invRes);parseLog(logRes);setSync('Synced '+items.length+' items &mdash; '+new Date().toLocaleTimeString(),'ok');}catch(e){setSync('Sync error: '+e.message,'err');}document.getElementById('sync-btn').disabled=false;renderAll();}
 function parseInventory(rows){if(!rows||rows.length<2){items=[];return;}items=rows.slice(1).map(r=>({id:parseInt(r[0])||nextId++,name:r[1]||'',sku:r[2]||'',category:r[3]||'',finish:r[4]||'',details:r[5]||'',qty:parseInt(r[6])||0,threshold:parseInt(r[7])||0,location:r[8]||'',notes:r[9]||'',cost:r[10]||''})).filter(i=>i.name.trim());if(items.length)nextId=Math.max(...items.map(i=>i.id))+1;}
 function parseLog(rows){if(!rows||rows.length<2){log=[];return;}log=rows.slice(1).map(r=>({timestamp:r[0]||'',action:r[1]||'out',itemId:r[2]||'',itemName:r[3]||'',qty:parseInt(r[4])||1,person:r[5]||'',reason:r[6]||''}));}
 async function saveInventory(){const data=[HEADERS,...items.map(i=>[i.id,i.name,i.sku,i.category,i.finish,i.details,i.qty,i.threshold,i.location,i.notes,i.cost])];await apiFetch(PROXY,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'saveInventory',data})});}
 async function appendLog(entry){await apiFetch(PROXY,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'appendLog',row:[entry.timestamp,entry.action,entry.itemId,entry.itemName,entry.qty,entry.person,entry.reason]})});}
-
 function getStatus(item){if(item.qty===0)return'out';if(item.threshold&&item.qty<=item.threshold)return'low';return'ok';}
-
-function renderStats(){const total=items.length,out=items.filter(i=>getStatus(i)==='out').length,low=items.filter(i=>getStatus(i)==='low').length;document.getElementById('stats-bar').innerHTML=[{n:total,l:'Total Items',a:false},{n:total-out-low,l:'In Stock',a:false},{n:low,l:'Low Stock',a:true},{n:out,l:'Out of Stock',a:true}].map(s=>`<div class="stat"><div class="stat-num ${s.a&&s.n>0?'alert':''}">${s.n}</div><div class="stat-label">${s.l}</div></div>`).join('');const c=low+out;document.getElementById('alert-bar').innerHTML=c>0?`<div class="alert-bar">&#9888; <strong>${c} item${c>1?'s':''}</strong> are low or out of stock. Review and reorder.</div>`:''}
-
-function renderTable(){const s=document.getElementById('s-search').value.toLowerCase(),cat=document.getElementById('s-cat').value,st=document.getElementById('s-status').value;const filtered=items.filter(i=>{const ms=!s||i.name.toLowerCase().includes(s)||i.sku.toLowerCase().includes(s)||(i.finish&&i.finish.toLowerCase().includes(s));return ms&&(!cat||i.category===cat)&&(!st||getStatus(i)===st);});const tbody=document.getElementById('tbl-body');if(!filtered.length){tbody.innerHTML=`<tr><td colspan="10" class="empty-msg">${items.length?'No items match your filters.':'No items yet. Tap + Add Item to get started.'}</td></tr>`;return;}const bMap={ok:'b-ok',low:'b-low',out:'b-out'},lMap={ok:'In Stock',low:'Low Stock',out:'Out of Stock'},qMap={ok:'qty-ok',low:'qty-low',out:'qty-out'};tbody.innerHTML=filtered.map(item=>{const s=getStatus(item);return`<tr><td class="sku-cell">${item.sku||'&mdash;'}</td><td style="font-weight:600;color:#435465">${item.name}</td><td><span class="cat-tag">${item.category}</span></td><td>${item.finish?'<span class="finish-tag">'+item.finish+'</span>':'<span style="color:#ccc">&mdash;</span>'}</td><td class="details-cell" title="${item.details||''}">${item.details||'&mdash;'}</td><td class="${qMap[s]}">${item.qty}</td><td style="color:#aaa">${item.threshold||'&mdash;'}</td><td style="font-size:12px">${item.location||'&mdash;'}</td><td><span class="badge ${bMap[s]}">${lMap[s]}</span></td><td><div class="actions"><button class="btn btn-blue btn-sm" onclick="openCO(${item.id})">In/Out</button><button class="btn btn-secondary btn-sm" onclick="openEdit(${item.id})">Edit</button><button class="btn btn-outline btn-sm" onclick="delItem(${item.id})">Del</button></div></td></tr>`;}).join('');}
-
+function renderStats(){const total=items.length,out=items.filter(i=>getStatus(i)==='out').length,low=items.filter(i=>getStatus(i)==='low').length;document.getElementById('stats-bar').innerHTML=[{n:total,l:'Total Items',a:false},{n:total-out-low,l:'In Stock',a:false},{n:low,l:'Low Stock',a:true},{n:out,l:'Out of Stock',a:true}].map(s=>`<div class="stat"><div class="stat-num ${s.a&&s.n>0?'alert':''}">${s.n}</div><div class="stat-label">${s.l}</div></div>`).join('');const c=low+out;document.getElementById('alert-bar').innerHTML=c>0?`<div class="alert-bar">&#9888; <strong>${c} item${c>1?'s':''}</strong> are low or out of stock. Review and reorder.</div>`:'';}
+function renderTable(){const s=document.getElementById('s-search').value.toLowerCase(),cat=document.getElementById('s-cat').value,st=document.getElementById('s-status').value;const filtered=items.filter(i=>{const ms=!s||i.name.toLowerCase().includes(s)||i.sku.toLowerCase().includes(s)||(i.finish&&i.finish.toLowerCase().includes(s));return ms&&(!cat||i.category===cat)&&(!st||getStatus(i)===st);});const tbody=document.getElementById('tbl-body');if(!filtered.length){tbody.innerHTML=`<tr><td colspan="10" class="empty-msg">${items.length?'No items match your filters.':'No items yet. Tap + Add Item to get started.'}</td></tr>`;return;}const bMap={ok:'b-ok',low:'b-low',out:'b-out'},lMap={ok:'In Stock',low:'Low Stock',out:'Out of Stock'},qMap={ok:'qty-ok',low:'qty-low',out:'qty-out'};tbody.innerHTML=filtered.map(item=>{const s=getStatus(item);return`<tr><td class="sku-cell">${item.sku||'&mdash;'}</td><td style="font-weight:600;color:#435465">${item.name}</td><td class="details-cell" title="${item.details||''}">${item.details||'&mdash;'}</td><td>${item.finish?'<span class="finish-tag">'+item.finish+'</span>':'<span style="color:#ccc">&mdash;</span>'}</td><td><span class="cat-tag">${item.category}</span></td><td class="${qMap[s]}">${item.qty}</td><td style="color:#aaa">${item.threshold||'&mdash;'}</td><td style="font-size:12px">${item.location||'&mdash;'}</td><td><span class="badge ${bMap[s]}">${lMap[s]}</span></td><td><div class="actions"><button class="btn btn-blue btn-sm" onclick="openCO(${item.id})">In/Out</button><button class="btn btn-secondary btn-sm" onclick="openEdit(${item.id})">Edit</button><button class="btn btn-outline btn-sm" onclick="delItem(${item.id})">Del</button></div></td></tr>`;}).join('');}
 function renderLog(){const el=document.getElementById('log-body');if(!log.length){el.innerHTML=`<div class="empty-msg" style="padding:48px"><div style="font-family:Georgia,serif;color:#435465;font-size:20px;margin-bottom:8px">No Activity Yet</div><div>Check-in and check-out activity will appear here.</div></div>`;return;}el.innerHTML=[...log].reverse().map(e=>`<div class="log-entry ${e.action}"><div><strong style="color:#435465">${e.action==='out'?'&#8593; Checked Out':'&#8595; Checked In'}</strong>&nbsp;${e.qty}&times;${e.itemName}${e.person?' &nbsp;&middot;&nbsp; <strong>'+e.person+'</strong>':''}${e.reason?' &nbsp;&middot;&nbsp; '+e.reason:''}</div><div class="log-ts">${e.timestamp}</div></div>`).join('');}
-
 function renderAll(){renderStats();renderTable();renderLog();}
 function switchTab(t){document.getElementById('panel-inv').style.display=t==='inv'?'':'none';document.getElementById('panel-log').style.display=t==='log'?'':'none';document.getElementById('tab-inv').className='tab'+(t==='inv'?' active':'');document.getElementById('tab-log').className='tab'+(t==='log'?' active':'');}
-
 function openAdd(){editId=null;document.getElementById('im-title').textContent='Add New Item';['f-name','f-sku','f-qty','f-thr','f-loc','f-notes','f-finish','f-details','f-cost'].forEach(id=>document.getElementById(id).value='');document.getElementById('f-cat').value='';document.getElementById('item-modal').style.display='';}
 function openEdit(id){const item=items.find(i=>i.id===id);if(!item)return;editId=id;document.getElementById('im-title').textContent='Edit Item';document.getElementById('f-name').value=item.name;document.getElementById('f-sku').value=item.sku;document.getElementById('f-cat').value=item.category;document.getElementById('f-finish').value=item.finish;document.getElementById('f-details').value=item.details;document.getElementById('f-qty').value=item.qty;document.getElementById('f-thr').value=item.threshold;document.getElementById('f-loc').value=item.location;document.getElementById('f-notes').value=item.notes;document.getElementById('f-cost').value=item.cost;document.getElementById('item-modal').style.display='';}
 function closeIM(){document.getElementById('item-modal').style.display='none';}
-
 async function saveItem(){const name=document.getElementById('f-name').value.trim(),cat=document.getElementById('f-cat').value;if(!name||!cat){alert('Name and Category are required.');return;}const btn=document.getElementById('im-save-btn');btn.disabled=true;btn.textContent='Saving...';const data={name,sku:document.getElementById('f-sku').value,category:cat,finish:document.getElementById('f-finish').value,details:document.getElementById('f-details').value,qty:parseInt(document.getElementById('f-qty').value)||0,threshold:parseInt(document.getElementById('f-thr').value)||0,location:document.getElementById('f-loc').value,notes:document.getElementById('f-notes').value,cost:document.getElementById('f-cost').value};if(editId!==null){items=items.map(i=>i.id===editId?{...i,...data}:i);}else{items.push({...data,id:nextId++});}closeIM();renderAll();setSync('Saving to Google Sheets...','syncing');try{await saveInventory();setSync('Saved successfully','ok');}catch(e){setSync('Save error: '+e.message,'err');}btn.disabled=false;btn.textContent='Save Item';}
-
 async function delItem(id){if(!confirm('Delete this item?'))return;items=items.filter(i=>i.id!==id);renderAll();setSync('Saving...','syncing');try{await saveInventory();setSync('Deleted and saved','ok');}catch(e){setSync('Save error: '+e.message,'err');}}
-
 function openCO(id){coId=id;const item=items.find(i=>i.id===id);if(!item)return;document.getElementById('co-title').textContent=item.name;document.getElementById('co-info').innerHTML=`<strong>SKU:</strong> ${item.sku||'N/A'} &nbsp;&middot;&nbsp; <strong>Finish:</strong> ${item.finish||'N/A'} &nbsp;&middot;&nbsp; <strong>Qty:</strong> ${item.qty}`;document.getElementById('co-action').value='out';document.getElementById('co-qty').value=1;document.getElementById('co-person').value='';document.getElementById('co-reason').value='';document.getElementById('co-modal').style.display='';}
 function closeCO(){document.getElementById('co-modal').style.display='none';}
-
 async function processCO(){const item=items.find(i=>i.id===coId);if(!item)return;const action=document.getElementById('co-action').value,qty=parseInt(document.getElementById('co-qty').value)||1,person=document.getElementById('co-person').value,reason=document.getElementById('co-reason').value;if(action==='out'&&qty>item.qty){alert('Only '+item.qty+' in stock.');return;}const btn=document.getElementById('co-save-btn');btn.disabled=true;btn.textContent='Saving...';items=items.map(i=>i.id===coId?{...i,qty:action==='out'?i.qty-qty:i.qty+qty}:i);const entry={timestamp:new Date().toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}),action,itemId:coId,itemName:item.name,qty,person,reason};log.push(entry);closeCO();renderAll();setSync('Saving to Google Sheets...','syncing');try{await Promise.all([saveInventory(),appendLog(entry)]);setSync('Saved successfully','ok');}catch(e){setSync('Save error: '+e.message,'err');}btn.disabled=false;btn.textContent='Confirm';}
-
-function exportCSV(){if(!items.length){alert('No items to export.');return;}const h=['SKU','Item Name','Category','Finish/Color','Details','Quantity','Low Stock At','Location','Status','Notes','Material Cost'];const rows=items.map(i=>[i.sku||'',i.name,i.category,i.finish||'',i.details||'',i.qty,i.threshold||'',i.location||'',getStatus(i),i.notes||'',i.cost||'']);const csv=[h,...rows].map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='rebath-inventory-'+new Date().toISOString().slice(0,10)+'.csv';a.click();}
-
+function exportCSV(){if(!items.length){alert('No items to export.');return;}const h=['SKU','Item Name','Details','Finish/Color','Category','Quantity','Low Stock At','Location','Status','Notes','Material Cost'];const rows=items.map(i=>[i.sku||'',i.name,i.details||'',i.finish||'',i.category,i.qty,i.threshold||'',i.location||'',getStatus(i),i.notes||'',i.cost||'']);const csv=[h,...rows].map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='rebath-inventory-'+new Date().toISOString().slice(0,10)+'.csv';a.click();}
 loadData();
 </script>
 </body>
