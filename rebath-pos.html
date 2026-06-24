@@ -257,7 +257,7 @@ function onSkuChange() {
   const item = inventory.find(i => i.sku === sku);
   if (!item) { info.textContent = ''; return; }
   const price = item.unitPrice ? `$${parseFloat(item.unitPrice).toFixed(2)} / unit` : 'No price on file';
-  info.textContent = `${item.category || ''} · ${price} · ${item.qty} in stock`;
+  info.textContent = `${item.name}${item.finishColor ? ' · ' + item.finishColor : ''}${item.details ? ' · ' + item.details : ''} · ${price} · ${item.qty} in stock`;
   document.getElementById('qtyInput').max = item.qty;
   document.getElementById('addToCartBtn').disabled = false;
 }
