@@ -21,6 +21,9 @@
   header { background: var(--rb-slate); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
   header h1 { font-family: var(--rb-font-heading); font-size: 20px; color: var(--rb-white); letter-spacing: 0.5px; }
   .header-right { font-size: 12px; color: var(--rb-clean-blue); text-align: right; white-space: nowrap; }
+  .btn-refresh { background: var(--rb-clean-blue); color: white; padding: 8px 14px; font-size: 13px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; white-space: nowrap; }
+  .btn-refresh:hover:not(:disabled) { background: #7aa5ba; }
+  .btn-refresh:disabled { opacity: 0.5; cursor: not-allowed; }
   main { flex: 1; display: grid; grid-template-columns: 1fr 380px; gap: 20px; padding: 20px; max-width: 1200px; margin: 0 auto; width: 100%; }
   .card { background: var(--rb-white); border-radius: 6px; border: 1px solid #ddd; overflow: hidden; }
   .card-header { background: var(--rb-slate); color: var(--rb-white); padding: 12px 20px; font-family: var(--rb-font-heading); font-size: 15px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
@@ -33,15 +36,12 @@
   input:focus, select:focus, textarea:focus { outline: none; border-color: var(--rb-clean-blue); }
   input::placeholder, textarea::placeholder { color: #bbb; }
   textarea { resize: none; height: 72px; }
-
-  /* SKU FILTER */
-  .sku-filter-input { margin-bottom: 8px; }
-  .sku-item-info { margin-top: 6px; font-size: 13px; color: var(--rb-clean-blue); min-height: 18px; }
-
-  /* SKU ROW */
-  .sku-row { display: grid; grid-template-columns: 100px auto; gap: 10px; align-items: end; margin-top: 10px; }
-
-  /* BUTTONS */
+  select { background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2212%22%20height%3D%228%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M1%201l5%205%205-5%22%20stroke%3D%22%236D6E70%22%20stroke-width%3D%222%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 38px; }
+  .filter-label-row { display: flex; align-items: baseline; justify-content: space-between; }
+  .filter-hint { font-size: 11px; color: #aaa; font-weight: normal; text-transform: none; letter-spacing: 0; }
+  .sku-item-info { margin-top: 8px; font-size: 13px; color: var(--rb-slate); background: #e8f0f5; border-radius: 4px; padding: 0; min-height: 0; transition: padding 0.15s; }
+  .sku-item-info.filled { padding: 10px 12px; }
+  .sku-row { display: grid; grid-template-columns: 100px auto; gap: 10px; align-items: end; margin-top: 12px; }
   .btn { padding: 11px 20px; border: none; border-radius: 4px; font-family: var(--rb-font-body); font-size: 14px; font-weight: bold; cursor: pointer; transition: opacity 0.15s, transform 0.1s; white-space: nowrap; }
   .btn:active { transform: scale(0.97); }
   .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
@@ -53,14 +53,12 @@
   .btn-complete:hover:not(:disabled) { background: #8f0429; }
   .btn-clear { background: transparent; color: var(--rb-dark-grey); border: 1px solid #ccc; padding: 8px 14px; font-size: 13px; }
   .btn-clear:hover { background: var(--rb-light-grey); }
-
-  /* CART */
   .cart-empty { text-align: center; padding: 32px 20px; color: #bbb; font-size: 14px; }
   .cart-empty svg { display: block; margin: 0 auto 10px; opacity: 0.3; }
   .cart-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--rb-light-grey); }
   .cart-item:last-child { border-bottom: none; }
   .cart-item-info { flex: 1; min-width: 0; }
-  .cart-item-name { font-size: 14px; font-weight: bold; color: var(--rb-slate); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cart-item-name { font-size: 14px; font-weight: bold; color: var(--rb-slate); }
   .cart-item-sku { font-size: 11px; color: #999; margin-top: 2px; }
   .cart-item-pricing { font-size: 13px; color: var(--rb-dark-grey); margin-top: 4px; }
   .cart-item-remove { background: none; border: none; color: #ccc; cursor: pointer; font-size: 18px; line-height: 1; padding: 2px; flex-shrink: 0; transition: color 0.15s; }
@@ -70,15 +68,11 @@
   .cart-total-amount { font-family: var(--rb-font-heading); font-size: 22px; font-weight: bold; color: var(--rb-slate); }
   .cart-count-badge { background: var(--rb-red); color: white; border-radius: 10px; padding: 2px 8px; font-size: 11px; margin-left: auto; }
   .cart-header-row { display: flex; align-items: center; justify-content: space-between; width: 100%; }
-
-  /* STATUS */
   .status-bar { text-align: center; padding: 10px 20px; font-size: 13px; font-weight: bold; border-top: 3px solid transparent; min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s; }
   .status-bar.idle { color: #aaa; }
   .status-bar.loading { background: #fffbea; border-color: #f0c040; color: #7a6000; }
   .status-bar.success { background: #edf7ed; border-color: var(--rb-green); color: var(--rb-green); }
   .status-bar.error { background: #fdecea; border-color: var(--rb-red); color: var(--rb-red); }
-
-  /* OVERLAY */
   .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; align-items: center; justify-content: center; padding: 24px; }
   .overlay.show { display: flex; }
   .overlay-card { background: white; border-radius: 8px; padding: 40px 48px; text-align: center; max-width: 460px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
@@ -87,15 +81,13 @@
   .overlay-card h2 { font-family: var(--rb-font-heading); font-size: 26px; color: var(--rb-slate); margin-bottom: 10px; }
   .overlay-card p { font-size: 15px; color: var(--rb-dark-grey); margin-bottom: 28px; line-height: 1.5; }
   .overlay-card .btn-primary { padding: 14px 40px; font-size: 15px; }
-
-  /* SPINNER */
   .spinner { width: 18px; height: 18px; border: 3px solid rgba(0,0,0,0.15); border-top-color: currentColor; border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
   @media (max-width: 820px) {
     main { grid-template-columns: 1fr; padding: 12px; gap: 12px; }
     .sku-row { grid-template-columns: 80px auto; gap: 8px; }
     header h1 { font-size: 16px; }
+    .header-right { display: none; }
   }
 </style>
 </head>
@@ -103,7 +95,10 @@
 
 <header>
   <h1>Material Pull Station</h1>
-  <div class="header-right">Warehouse Operations<br>Re-Bath of New England</div>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <button class="btn-refresh" id="refreshBtn" onclick="refreshInventory()" title="Reload inventory from the Sheet">&#8635; Refresh</button>
+    <div class="header-right">Warehouse Operations<br>Re-Bath of New England</div>
+  </div>
 </header>
 
 <main>
@@ -128,10 +123,25 @@
     <div class="card">
       <div class="card-header"><span class="step-badge">2</span> Add Items to Cart</div>
       <div class="card-body">
+
         <div class="field-group">
-          <label for="skuFilter">Filter SKU or Item Name</label>
-          <input type="text" id="skuFilter" class="sku-filter-input" placeholder="Type to filter…" autocomplete="off" autocorrect="off" autocapitalize="off" oninput="filterSkus()">
-          <select id="skuSelect" onchange="onSkuChange()" size="1">
+          <div class="filter-label-row">
+            <label for="catFilter">Filter by Category</label>
+            <span class="filter-hint">number in stock</span>
+          </div>
+          <select id="catFilter" onchange="filterSkus()">
+            <option value="">All Categories</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label for="skuFilter">Search SKU, Name, Finish, or Details</label>
+          <input type="text" id="skuFilter" placeholder="Type to narrow the list…" autocomplete="off" autocorrect="off" autocapitalize="off" oninput="filterSkus()">
+        </div>
+
+        <div class="field-group">
+          <label for="skuSelect">Select Item</label>
+          <select id="skuSelect" onchange="onSkuChange()">
             <option value="">— Loading inventory… —</option>
           </select>
           <div id="skuInfo" class="sku-item-info"></div>
@@ -140,6 +150,7 @@
             <button class="btn btn-add" id="addToCartBtn" onclick="addToCart()" disabled>Add to Cart</button>
           </div>
         </div>
+
       </div>
     </div>
 
@@ -165,7 +176,7 @@
       <div class="card-body" style="flex:1;overflow-y:auto;max-height:420px;">
         <div id="cartEmpty" class="cart-empty">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-          No items yet.<br>Filter and select a SKU above.
+          No items yet.<br>Filter and select an item above.
         </div>
         <div id="cartItems"></div>
       </div>
@@ -197,97 +208,204 @@
 </div>
 
 <script>
+// ══════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxmKcUMX_kQ51jDcsnnBEggjnwc15l-PW1kbb7O5ndvs1hZn2Z9g3emQnhJlMQ0k-wSgQ/exec';
+
+const CATEGORIES = [
+  'Accessories',
+  'Countertops & Splashes',
+  'Flooring',
+  'Home Depot Signs',
+  'Kozy Kollars',
+  'Lights',
+  'Med Cabs & Mirrors',
+  'Multi-Function Trim Kits',
+  'Pedestal',
+  'Plumbing',
+  'Plumbing Parts',
+  'Safeway Steps',
+  'Seats',
+  'Shower Doors',
+  'Supplies',
+  'Toilets',
+  'Tools & Equipment',
+  'Trim Kit',
+  'Tubs & Showers',
+  'Vanity & Cabinets',
+  'Vanity Faucets',
+  'Vent Fans',
+  'Wall Surrounds'
+];
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
 let inventory = [];
 let cart = [];
 
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
   loadInventory();
   document.getElementById('installerName').addEventListener('input', updateCompleteBtn);
   document.getElementById('customerName').addEventListener('input', updateCompleteBtn);
 });
 
+// ══════════════════════════════════════════
+// LOAD INVENTORY
+// ══════════════════════════════════════════
 async function loadInventory() {
   setStatus('loading', 'Loading inventory…');
   try {
-    const res = await fetch(`${APPS_SCRIPT_URL}?action=getPOSInventory`);
+    const res  = await fetch(APPS_SCRIPT_URL + '?action=getPOSInventory&t=' + Date.now());
     const data = await res.json();
     if (data.error) throw new Error(data.error);
     inventory = (data.items || []).filter(i => i.qty > 0);
+    populateCategories();
     populateDropdown(inventory);
-    setStatus('idle', 'Ready');
+    setStatus('idle', 'Ready — ' + inventory.length + ' items in stock');
   } catch (err) {
     setStatus('error', 'Could not load inventory. Check connection.');
     document.getElementById('skuSelect').innerHTML = '<option value="">— Failed to load —</option>';
   }
 }
 
+async function refreshInventory() {
+  const btn = document.getElementById('refreshBtn');
+  btn.disabled = true;
+  btn.innerHTML = 'Refreshing…';
+  await loadInventory();
+  document.getElementById('catFilter').value = '';
+  document.getElementById('skuFilter').value = '';
+  btn.disabled = false;
+  btn.innerHTML = '&#8635; Refresh';
+}
+
+// ══════════════════════════════════════════
+// CATEGORY DROPDOWN
+// ══════════════════════════════════════════
+function populateCategories() {
+  const sel = document.getElementById('catFilter');
+  const fromSheet = inventory.map(i => i.category).filter(Boolean);
+  const all = Array.from(new Set(CATEGORIES.concat(fromSheet)))
+                   .sort((a, b) => a.localeCompare(b));
+  const counts = {};
+  inventory.forEach(i => { counts[i.category] = (counts[i.category] || 0) + 1; });
+  sel.innerHTML = '<option value="">All Categories (' + inventory.length + ')</option>' +
+    all.map(c => '<option value="' + c + '">' + c + ' (' + (counts[c] || 0) + ')</option>').join('');
+}
+
+// ══════════════════════════════════════════
+// ITEM DROPDOWN
+// ══════════════════════════════════════════
 function populateDropdown(items) {
   const sel = document.getElementById('skuSelect');
   if (!items.length) {
-    sel.innerHTML = '<option value="">— No items in stock —</option>';
+    sel.innerHTML = '<option value="">— No matching items in stock —</option>';
+    document.getElementById('addToCartBtn').disabled = true;
     return;
   }
-  sel.innerHTML = '<option value="">— Select a SKU —</option>' +
+  sel.innerHTML = '<option value="">— Select an item (' + items.length + ') —</option>' +
     items.map(i =>
-      `<option value="${i.sku}">${i.sku} — ${i.name}${i.finishColor ? ' / ' + i.finishColor : ''}</option>`
+      '<option value="' + i.sku + '">' + i.sku + ' — ' + i.name +
+      (i.finishColor ? ' / ' + i.finishColor : '') +
+      (i.details ? ' / ' + i.details : '') + '</option>'
     ).join('');
-  document.getElementById('addToCartBtn').disabled = false;
 }
 
 function filterSkus() {
-  const q = document.getElementById('skuFilter').value.trim().toLowerCase();
-  const filtered = q
-    ? inventory.filter(i =>
-        i.sku.toLowerCase().includes(q) ||
-        i.name.toLowerCase().includes(q) ||
-        (i.finishColor && i.finishColor.toLowerCase().includes(q))
-      )
-    : inventory;
+  const q   = document.getElementById('skuFilter').value.trim().toLowerCase();
+  const cat = document.getElementById('catFilter').value;
+  let filtered = inventory;
+  if (cat) filtered = filtered.filter(i => i.category === cat);
+  if (q) {
+    filtered = filtered.filter(i =>
+      i.sku.toLowerCase().includes(q) ||
+      i.name.toLowerCase().includes(q) ||
+      (i.finishColor && i.finishColor.toLowerCase().includes(q)) ||
+      (i.details && i.details.toLowerCase().includes(q))
+    );
+  }
   populateDropdown(filtered);
   document.getElementById('skuSelect').value = '';
-  document.getElementById('skuInfo').textContent = '';
+  clearSkuInfo();
   document.getElementById('addToCartBtn').disabled = true;
 }
 
 function onSkuChange() {
-  const sku = document.getElementById('skuSelect').value;
-  const info = document.getElementById('skuInfo');
-  if (!sku) { info.textContent = ''; document.getElementById('addToCartBtn').disabled = true; return; }
+  const sku  = document.getElementById('skuSelect').value;
+  if (!sku) { clearSkuInfo(); document.getElementById('addToCartBtn').disabled = true; return; }
   const item = inventory.find(i => i.sku === sku);
-  if (!item) { info.textContent = ''; return; }
-  const price = item.unitPrice ? `$${parseFloat(item.unitPrice).toFixed(2)} / unit` : 'No price on file';
-  info.textContent = `${item.name}${item.finishColor ? ' · ' + item.finishColor : ''}${item.details ? ' · ' + item.details : ''} · ${price} · ${item.qty} in stock`;
+  if (!item) { clearSkuInfo(); return; }
+  const price = item.unitPrice ? '$' + parseFloat(item.unitPrice).toFixed(2) + ' / unit' : 'No price on file';
+  const info  = document.getElementById('skuInfo');
+  info.innerHTML =
+    '<strong style="display:block;font-size:14px;">' + item.name + '</strong>' +
+    (item.finishColor ? '<span>' + item.finishColor + '</span>' : '') +
+    (item.finishColor && item.details ? ' <span style="color:#aaa;">·</span> ' : '') +
+    (item.details ? '<span>' + item.details + '</span>' : '') +
+    '<div style="margin-top:4px;font-size:12px;color:#6D6E70;">' +
+      item.category + ' <span style="color:#aaa;">·</span> ' + price +
+      ' <span style="color:#aaa;">·</span> <strong>' + item.qty + ' in stock</strong>' +
+    '</div>';
+  info.classList.add('filled');
   document.getElementById('qtyInput').max = item.qty;
   document.getElementById('addToCartBtn').disabled = false;
 }
 
+function clearSkuInfo() {
+  const info = document.getElementById('skuInfo');
+  info.innerHTML = '';
+  info.classList.remove('filled');
+}
+
+// ══════════════════════════════════════════
+// CART
+// ══════════════════════════════════════════
 function addToCart() {
   const sku = document.getElementById('skuSelect').value;
   const qty = parseInt(document.getElementById('qtyInput').value, 10);
-  if (!sku) { setStatus('error', 'Select a SKU first.'); return; }
+  if (!sku) { setStatus('error', 'Select an item first.'); return; }
   if (!qty || qty < 1) { setStatus('error', 'Enter a valid quantity.'); return; }
   const item = inventory.find(i => i.sku === sku);
   if (!item) return;
-  if (qty > item.qty) { setStatus('error', `Only ${item.qty} in stock for ${sku}.`); return; }
+  if (qty > item.qty) { setStatus('error', 'Only ' + item.qty + ' in stock for ' + sku + '.'); return; }
+
   const existing = cart.find(c => c.sku === sku);
   if (existing) {
     const newQty = existing.qty + qty;
-    if (newQty > item.qty) { setStatus('error', `Total qty (${newQty}) exceeds stock (${item.qty}) for ${sku}.`); return; }
+    if (newQty > item.qty) {
+      setStatus('error', 'Total qty (' + newQty + ') exceeds stock (' + item.qty + ') for ' + sku + '.');
+      return;
+    }
     existing.qty = newQty;
     existing.lineTotal = existing.qty * (existing.unitPrice || 0);
   } else {
     const unitPrice = parseFloat(item.unitPrice) || 0;
-    cart.push({ id: item.id, sku: item.sku, name: item.name, unitPrice, qty, lineTotal: qty * unitPrice });
+    cart.push({
+      id: item.id,
+      sku: item.sku,
+      name: item.name,
+      finishColor: item.finishColor || '',
+      details: item.details || '',
+      unitPrice: unitPrice,
+      qty: qty,
+      lineTotal: qty * unitPrice
+    });
   }
+
   renderCart();
   document.getElementById('skuFilter').value = '';
+  document.getElementById('catFilter').value = '';
   document.getElementById('skuSelect').value = '';
   document.getElementById('qtyInput').value = '1';
-  document.getElementById('skuInfo').textContent = '';
+  clearSkuInfo();
   document.getElementById('addToCartBtn').disabled = true;
   populateDropdown(inventory);
-  setStatus('idle', `${item.name} added to cart.`);
+  setStatus('idle', item.name + ' added to cart.');
 }
 
 function removeFromCart(sku) {
@@ -306,10 +424,11 @@ function clearCart() {
 }
 
 function renderCart() {
-  const empty = document.getElementById('cartEmpty');
-  const items = document.getElementById('cartItems');
-  const badge = document.getElementById('cartBadge');
+  const empty   = document.getElementById('cartEmpty');
+  const items   = document.getElementById('cartItems');
+  const badge   = document.getElementById('cartBadge');
   const totalEl = document.getElementById('cartTotal');
+
   if (!cart.length) {
     empty.style.display = '';
     items.innerHTML = '';
@@ -318,66 +437,102 @@ function renderCart() {
     updateCompleteBtn();
     return;
   }
+
   empty.style.display = 'none';
   const total = cart.reduce((s, c) => s + c.lineTotal, 0);
-  totalEl.textContent = `$${total.toFixed(2)}`;
+  totalEl.textContent = '$' + total.toFixed(2);
   badge.style.display = '';
   const totalUnits = cart.reduce((s, c) => s + c.qty, 0);
-  badge.textContent = `${cart.length} SKU${cart.length !== 1 ? 's' : ''} · ${totalUnits} unit${totalUnits !== 1 ? 's' : ''}`;
-  items.innerHTML = cart.map(c => `
-    <div class="cart-item">
-      <div class="cart-item-info">
-        <div class="cart-item-name">${c.name}</div>
-        <div class="cart-item-sku">SKU: ${c.sku}</div>
-        <div class="cart-item-pricing">${c.qty} × $${c.unitPrice.toFixed(2)} = <strong>$${c.lineTotal.toFixed(2)}</strong></div>
-      </div>
-      <button class="cart-item-remove" onclick="removeFromCart('${c.sku}')" title="Remove">×</button>
-    </div>`).join('');
+  badge.textContent = cart.length + ' SKU' + (cart.length !== 1 ? 's' : '') +
+                      ' · ' + totalUnits + ' unit' + (totalUnits !== 1 ? 's' : '');
+
+  items.innerHTML = cart.map(c =>
+    '<div class="cart-item">' +
+      '<div class="cart-item-info">' +
+        '<div class="cart-item-name">' + c.name + '</div>' +
+        '<div class="cart-item-sku">SKU: ' + c.sku +
+          (c.finishColor ? ' · ' + c.finishColor : '') +
+          (c.details ? ' · ' + c.details : '') +
+        '</div>' +
+        '<div class="cart-item-pricing">' + c.qty + ' × $' + c.unitPrice.toFixed(2) +
+          ' = <strong>$' + c.lineTotal.toFixed(2) + '</strong></div>' +
+      '</div>' +
+      '<button class="cart-item-remove" onclick="removeFromCart(\'' + c.sku + '\')" title="Remove">×</button>' +
+    '</div>'
+  ).join('');
+
   updateCompleteBtn();
 }
 
 function updateCompleteBtn() {
   const installer = document.getElementById('installerName').value.trim();
-  const customer = document.getElementById('customerName').value.trim();
+  const customer  = document.getElementById('customerName').value.trim();
   document.getElementById('completeBtn').disabled = !(installer && customer && cart.length);
 }
 
+// ══════════════════════════════════════════
+// COMPLETE PULL
+// ══════════════════════════════════════════
 async function completePull() {
   const installer = document.getElementById('installerName').value.trim();
-  const customer = document.getElementById('customerName').value.trim();
-  const notes = document.getElementById('pullNotes').value.trim();
+  const customer  = document.getElementById('customerName').value.trim();
+  const notes     = document.getElementById('pullNotes').value.trim();
   if (!installer || !customer || !cart.length) return;
+
   const total = cart.reduce((s, c) => s + c.lineTotal, 0);
   const payload = {
-    action: 'completePull', installer, customer, notes,
+    action: 'completePull',
+    installer: installer,
+    customer: customer,
+    notes: notes,
     total: total.toFixed(2),
-    items: cart.map(c => ({ id: c.id, sku: c.sku, name: c.name, qty: c.qty, unitPrice: c.unitPrice.toFixed(2), lineTotal: c.lineTotal.toFixed(2) }))
+    items: cart.map(c => ({
+      id: c.id,
+      sku: c.sku,
+      name: c.name,
+      finishColor: c.finishColor,
+      details: c.details,
+      qty: c.qty,
+      unitPrice: c.unitPrice.toFixed(2),
+      lineTotal: c.lineTotal.toFixed(2)
+    }))
   };
+
   document.getElementById('completeBtn').disabled = true;
   setStatus('loading', 'Submitting pull — updating inventory and sending receipt…');
+
   try {
-    const res = await fetch(APPS_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(payload) });
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    });
     const data = await res.json();
     if (data.error) throw new Error(data.error);
     await loadInventory();
-    document.getElementById('overlayMsg').textContent = `Inventory updated and receipt sent to the production team. Total: $${total.toFixed(2)}`;
+    document.getElementById('overlayMsg').textContent =
+      'Inventory updated and receipt sent to the production team. Total: $' + total.toFixed(2);
     document.getElementById('successOverlay').classList.add('show');
     setStatus('success', 'Pull complete. Receipt sent.');
   } catch (err) {
-    setStatus('error', `Submission failed: ${err.message}. Please try again or contact the office.`);
+    setStatus('error', 'Submission failed: ' + err.message + '. Please try again or contact the office.');
     document.getElementById('completeBtn').disabled = false;
   }
 }
 
+// ══════════════════════════════════════════
+// RESET
+// ══════════════════════════════════════════
 function resetForm() {
   cart = [];
   document.getElementById('installerName').value = '';
   document.getElementById('customerName').value = '';
   document.getElementById('pullNotes').value = '';
   document.getElementById('skuFilter').value = '';
+  document.getElementById('catFilter').value = '';
   document.getElementById('skuSelect').value = '';
   document.getElementById('qtyInput').value = '1';
-  document.getElementById('skuInfo').textContent = '';
+  clearSkuInfo();
   document.getElementById('addToCartBtn').disabled = true;
   populateDropdown(inventory);
   renderCart();
@@ -385,10 +540,13 @@ function resetForm() {
   setStatus('idle', 'Ready for next pull.');
 }
 
+// ══════════════════════════════════════════
+// STATUS
+// ══════════════════════════════════════════
 function setStatus(type, msg) {
   const bar = document.getElementById('statusBar');
-  bar.className = `status-bar ${type}`;
-  bar.innerHTML = type === 'loading' ? `<span class="spinner"></span>${msg}` : msg;
+  bar.className = 'status-bar ' + type;
+  bar.innerHTML = type === 'loading' ? '<span class="spinner"></span>' + msg : msg;
 }
 </script>
 </body>
